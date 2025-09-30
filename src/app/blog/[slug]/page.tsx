@@ -1,8 +1,11 @@
+// app/blog/[slug]/page.tsx
+
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
+import styles from './page.module.css'; // <-- ZMIANA: Importujemy style
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
@@ -31,8 +34,8 @@ async function getPostData(slug: string) {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
     const postData = await getPostData(params.slug);
     return {
-        title: postData.title, // Tutaj trafi tytuł z pliku .md
-        description: postData.description, // Tutaj meta opis z pliku .md
+        title: postData.title,
+        description: postData.description,
     };
 }
 
@@ -41,25 +44,30 @@ export default async function Post({ params }: { params: { slug: string } }) {
     const postData = await getPostData(params.slug);
 
     return (
-        <article>
-            <h1>{postData.title}</h1>
-            <div>{postData.date}</div>
-            <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
-        </article>
+        // <-- ZMIANA: Dodajemy główny kontener centrujący treść
+        <main className={styles.articleContainer}>
+            <article>
+                {/* Tytuł i data są teraz poza treścią z Markdown dla lepszej kontroli */}
+                <h1>{postData.title}</h1>
+                <div style={{color: '#6b7280', marginBottom: '2rem', marginTop: '0.5rem'}}>
+                    Opublikowano: {postData.date}
+                </div>
+
+                {/* Ten kontener otrzyma style dla treści artykułu (paragrafy, listy, etc.) */}
+                <div
+                    className={styles.articleContent}
+                    dangerouslySetInnerHTML={{ __html: postData.contentHtml }}
+                />
+            </article>
+        </main>
     );
 }
 
 // Funkcja generująca statyczne ścieżki dla wszystkich postów
-// app/blog/[slug]/page.tsx
-
-// ... (reszta importów i kodu bez zmian) ...
-
 export async function generateStaticParams() {
     const postsDirectory = path.join(process.cwd(), 'posts');
 
-    // Sprawdzamy, czy folder w ogóle istnieje
     if (!fs.existsSync(postsDirectory)) {
-        // Jeśli nie, zwracamy pustą tablicę. Build się powiedzie, ale nie wygeneruje żadnych postów.
         return [];
     }
 

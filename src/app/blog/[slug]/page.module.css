@@ -1,0 +1,67 @@
+/* app/blog/[slug]/page.module.css */
+
+.articleContainer {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.articleContent h1,
+.articleContent h2,
+.articleContent h3,
+.articleContent h4 {
+    color: #111827;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    line-height: 1.2;
+}
+
+.articleContent h1 {
+    font-size: 2.25rem; /* 36px */
+    font-weight: 800;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+.articleContent h2 {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 700;
+}
+
+.articleContent h3 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 600;
+}
+
+.articleContent p {
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    font-size: 1.125rem; /* 18px */
+    color: #374151;
+}
+
+.articleContent ul,
+.articleContent ol {
+    padding-left: 2rem;
+    margin-bottom: 1.25rem;
+}
+
+.articleContent li {
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    color: #374151;
+}
+
+.articleContent strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+.articleContent a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.articleContent a:hover {
+    color: #1d4ed8;
+}

@@ -1,16 +1,23 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
+import 'dotenv/config'; // WAŻNE: Importujemy dotenv, aby załadować zmienne z pliku .env
 
-// Konfiguracja
+// --- KONFIGURACJA ---
+const POSTS_TO_GENERATE = 3; // Ile postów chcemy wygenerować?
+
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 if (!GEMINI_API_KEY) {
-    throw new Error("Brak klucza GEMINI_API_KEY w zmiennych środowiskowych.");
+    throw new Error("Brak klucza GEMINI_API_KEY. Upewnij się, że masz plik .env z tym kluczem.");
 }
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Używamy szybszego modelu
 
-// Lista tematów, aby AI miało z czego losować
+// --- DODAJ TĘ LINIĘ ---
+console.log(`DEBUG: Używany fragment klucza API: ${GEMINI_API_KEY.substring(0, 5)}...${GEMINI_API_KEY.slice(-4)}`);
+// ----------------------
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 const topics = [
     "jak wyjść z pętli chwilówek",
     "konsolidacja kredytów czy warto",
@@ -19,21 +26,47 @@ const topics = [
     "jak zbudować poduszkę finansową",
     "upadłość konsumencka krok po kroku",
     "przedawnienie długów w Polsce",
+    "jak poprawić swoją zdolność kredytową",
+    "co to jest BIK i jak sprawdzić swój raport",
+    "ulga na złe długi w podatkach"
 ];
 
-async function generatePost() {
-    try {
-        const topic = topics[Math.floor(Math.random() * topics.length)];
-        console.log(`Wybrano temat: ${topic}`);
+// Funkcja pomocnicza do opóźnień
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // --- Tutaj uwzględniamy Twoje wytyczne SEO! ---
-        const prompt = `
+// Główna funkcja generująca JEDEN post
+// Proszę, zastąp całą swoją funkcję `generateSinglePost` tą wersją
+// W pliku src/app/scripts/generatePost.mjs
+// ZASTĄP TĘ FUNKCJĘ
+
+// W pliku src/app/scripts/generatePost.mjs
+// ZASTĄP TĘ FUNKCJĘ
+// Funkcja do tworzenia "czystych" slugów
+function slugify(text) {
+    const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
+    const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrssssssttuuuuuuuuuwxyyzzz------'
+    const p = new RegExp(a.split('').join('|'), 'g')
+
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+        .replace(/&/g, '-and-') // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+        .replace(/\-\-+/g, '-') // Replace multiple - with single -
+        .replace(/^-+/, '') // Trim - from start of text
+        .replace(/-+$/, '') // Trim - from end of text
+}
+
+async function generateSinglePost(topic) {
+    console.log(`\n--- Generowanie posta na temat: "${topic}" ---`);
+
+    const prompt = `
       Napisz artykuł blogowy na temat: "${topic}".
       Artykuł powinien być napisany w języku polskim, w formacie Markdown.
       Celem jest SEO, więc używaj nagłówków (H2, H3), list i pogrubień.
       Artykuł ma być praktyczny i pomocny dla kogoś, kto ma problemy finansowe.
 
-      Na samym początku odpowiedzi, bez żadnych dodatkowych opisów, zwróć obiekt JSON wewnątrz bloku kodu markdown, o następującej strukturze:
+      Zwróć obiekt JSON o następującej strukturze:
       {
         "title": "Tytuł SEO (maksymalnie 30 znaków)",
         "description": "Meta description (maksymalnie 90 znaków)",
@@ -42,23 +75,39 @@ async function generatePost() {
       }
     `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let text = response.text();
+    const generationConfig = {
+        responseMimeType: "application/json",
+    };
 
-        // Wyciąganie JSON-a z odpowiedzi
-        text = text.replace('```json', '').replace('```', '').trim();
-        const data = JSON.parse(text);
+    const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig,
+    });
 
-        // Walidacja danych
-        if (!data.title || !data.description || !data.slug || !data.content) {
-            throw new Error("AI nie zwróciło poprawnych danych JSON.");
-        }
+    const response = await result.response;
+    const text = response.text();
+    let data;
 
-        const { title, description, slug, content } = data;
-        const date = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+    try {
+        data = JSON.parse(text);
+    } catch (error) {
+        console.error("BŁĄD: Nie udało się sparsować odpowiedzi JSON od AI.");
+        console.error("Otrzymany tekst:", text);
+        throw new Error("Błąd parsowania JSON.");
+    }
 
-        const markdownContent = `---
+    // ZMIANA: Dodajemy logowanie obiektu PRZED rzuceniem błędu
+    if (!data.title || !data.description || !data.slug || !data.content) {
+        console.error("Otrzymany (niekompletny) obiekt JSON:", JSON.stringify(data, null, 2));
+        throw new Error("AI nie zwróciło wszystkich wymaganych pól w JSON.");
+    }
+
+    const { title, description, content } = data;
+    const cleanSlug = slugify(data.slug);
+
+    const date = new Date().toLocaleDateString('pl-PL');
+
+    const markdownContent = `---
 title: "${title.replace(/"/g, '\\"')}"
 date: "${date}"
 description: "${description.replace(/"/g, '\\"')}"
@@ -66,20 +115,40 @@ description: "${description.replace(/"/g, '\\"')}"
 
 ${content}
 `;
-        const filePath = path.join(process.cwd(), 'posts', `${slug}.md`);
+    const filePath = path.join(process.cwd(), 'posts', `${cleanSlug}.md`);
 
-        if (fs.existsSync(filePath)) {
-            console.log(`Plik ${slug}.md już istnieje. Przerywam.`);
-            return;
-        }
-
-        fs.writeFileSync(filePath, markdownContent);
-        console.log(`Pomyślnie wygenerowano i zapisano artykuł: ${slug}.md`);
-
-    } catch (error) {
-        console.error("Wystąpił błąd podczas generowania posta:", error);
-        process.exit(1); // Zakończ z kodem błędu
+    if (fs.existsSync(filePath)) {
+        console.log(`Plik ${cleanSlug}.md już istnieje. Pomijam.`);
+        return;
     }
+
+    fs.writeFileSync(filePath, markdownContent);
+    console.log(`✅ Pomyślnie zapisano artykuł: ${cleanSlug}.md`);
+}// Funkcja sterująca, która uruchamia pętlę
+async function main() {
+    console.log(`Rozpoczynam generowanie ${POSTS_TO_GENERATE} postów...`);
+
+    // Tasujemy tematy, aby za każdym razem były inne i unikalne
+    const shuffledTopics = topics.sort(() => 0.5 - Math.random());
+
+    if (shuffledTopics.length < POSTS_TO_GENERATE) {
+        console.error("Błąd: Za mało unikalnych tematów w liście 'topics' w porównaniu do 'POSTS_TO_GENERATE'.");
+        return;
+    }
+
+    const selectedTopics = shuffledTopics.slice(0, POSTS_TO_GENERATE);
+
+    for (const topic of selectedTopics) {
+        try {
+            await generateSinglePost(topic);
+            await sleep(2000); // Czekamy 2 sekundy między zapytaniami, aby nie obciążać API
+        } catch (error) {
+            console.error(`Nie udało się wygenerować posta na temat "${topic}". Błąd:`, error.message);
+        }
+    }
+
+    console.log('\nZakończono proces generowania.');
 }
 
-generatePost();
+// Uruchomienie głównej funkcji
+main();
