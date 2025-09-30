@@ -1,0 +1,40 @@
+name: Codzienne Generowanie Posta AI
+
+on:
+  workflow_dispatch: # Pozwala na ręczne uruchomienie
+  schedule:
+    - cron: '0 8 * * 1-5' # Uruchom o 8:00 UTC (10:00 czasu polskiego letniego) od poniedziałku do piątku
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pobieranie repozytorium
+        uses: actions/checkout@v4
+
+      - name: Ustawienie Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Użyj stabilnej wersji Node.js
+
+      - name: Instalacja zależności
+        run: npm install
+
+      - name: Uruchomienie skryptu generującego post
+        run: node scripts/generatePost.mjs
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Pobranie klucza z GitHub Secrets
+
+      - name: Commit i Push nowego posta
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add posts/*.md
+          # Sprawdź, czy są jakieś zmiany do commitowania
+          if ! git diff --staged --quiet; then
+            git commit -m "feat: Dodanie nowego posta blogowego przez AI"
+            git push
+          else
+            echo "Brak nowych postów do dodania."
+          fi
