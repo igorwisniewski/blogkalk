@@ -3,7 +3,7 @@ name: Codzienne Generowanie Posta AI
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * 1-5' # Uruchom o 8:00 UTC (10:00 czasu polskiego letniego) od poniedziałku do piątku
+    - cron: '0 11 * * 1-5' # Uruchom o 12:00 UTC (12:00 czasu polskiego letniego) od poniedziałku do piątku
 
 jobs:
   build-and-commit:
@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Uruchomienie skryptu generującego post
-        run: node app/scripts/generatePost.mjs
+        run: node src/app/scripts/generatePost.mjs
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
