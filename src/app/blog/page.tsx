@@ -5,7 +5,6 @@ import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
 
-// Typ, który pomoże nam w zarządzaniu danymi posta
 type Post = {
     slug: string;
     title: string;
@@ -13,11 +12,9 @@ type Post = {
     description: string;
 };
 
-// Funkcja, która pobierze i przetworzy wszystkie posty z folderu /posts
 async function getAllPosts(): Promise<Post[]> {
     const postsDirectory = path.join(process.cwd(), 'posts');
 
-    // Sprawdzamy, czy folder istnieje, aby uniknąć błędów
     if (!fs.existsSync(postsDirectory)) {
         return [];
     }
@@ -25,14 +22,11 @@ async function getAllPosts(): Promise<Post[]> {
     const fileNames = fs.readdirSync(postsDirectory);
 
     const allPostsData = fileNames.map((fileName): Post => {
-        // Usuwamy ".md" z nazwy pliku, aby uzyskać slug
         const slug = fileName.replace(/\.md$/, '');
 
-        // Czytamy zawartość pliku markdown jako string
         const fullPath = path.join(postsDirectory, fileName);
         const fileContents = fs.readFileSync(fullPath, 'utf8');
 
-        // Używamy gray-matter do sparsowania metadanych (frontmatter)
         const matterResult = matter(fileContents);
 
         return {
@@ -53,13 +47,12 @@ async function getAllPosts(): Promise<Post[]> {
     });
 }
 
-// Główny komponent strony, który wyświetli listę postów
 export default async function BlogIndexPage() {
     const posts = await getAllPosts();
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Nasz Blog o Finansach</h1>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }} className="min-h-screen ">
+            <h1 style={{ textAlign: 'center', marginBottom: '2rem' }} className="text-2xl">Nasz Blog o Finansach</h1>
 
             {posts.length === 0 ? (
                 <p>Nie znaleziono jeszcze żadnych artykułów.</p>

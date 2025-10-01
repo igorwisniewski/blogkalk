@@ -65,3 +65,21 @@
 .articleContent a:hover {
     color: #1d4ed8;
 }
+
+
+.backLink {
+    display: inline-block;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    color: #4b5563; /* text-gray-600 */
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem; /* rounded-md */
+    background-color: #f3f4f6; /* bg-gray-100 */
+    transition: background-color 0.2s;
+}
+
+.backLink:hover {
+    background-color: #e5e7eb; /* bg-gray-200 */
+    color: #1f2937; /* text-gray-800 */
+}
