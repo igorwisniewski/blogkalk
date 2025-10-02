@@ -3,7 +3,7 @@ name: Codzienne Generowanie Posta AI
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 11 * * 1-5' # Uruchom o 12:00 UTC (12:00 czasu polskiego letniego) od poniedziałku do piątku
+    - cron: '0 10 * * 1-5' # Uruchom o 12:00 UTC (12:00 czasu polskiego letniego) od poniedziałku do piątku
 
 jobs:
   build-and-commit:
