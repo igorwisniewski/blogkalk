@@ -18,11 +18,11 @@ export default function CounterCard({ title,description, icon: Icon, count, onIn
     return (
         // GŁÓWNY KONTENER: Domyślnie w pionie, od 'sm' w górę w poziomie
         <div className={`p-4 rounded-lg border-2 transition-colors duration-200 flex flex-col sm:flex-row sm:items-center sm:justify-between
-      ${isActive ? 'border-blue-500 bg-blue-500/10' : 'border-brand-border bg-brand-bg-light'}`}>
+      ${isActive ? 'border-blue-500 bg-blue-500/10' : 'border-blue-700 bg-brand-bg-light'}`}>
 
             {/* Kontener na tekst i ikonę */}
             <div className="flex items-center w-full">
-                <Icon className={`h-8 w-8 mr-4 flex-shrink-0 transition-colors ${isActive ? 'text-blue-500' : 'text-slate-900'}`} />
+                <Icon className={`h-8 w-8 mr-4 flex-shrink-0 transition-colors ${isActive ? 'text-blue-500' : 'text-blue-800'}`} />
                 <div className="text-left">
                     <h4 className={`font-bold ${isActive ? 'text-slate-900': 'text-slate-900'}`}>{title}</h4>
                     <p className="text-sm text-slate-400">{description}</p>

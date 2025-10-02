@@ -125,7 +125,7 @@ export default function SzczegolowyFormularz() {
 
     // Używamy tagu <form> do obsługi wysyłki
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto p-4 sm:p-8 text-center rounded-xl space-y-12">
+        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto p-4 sm:p-8 text-center rounded-xl space-y-12 shadow-lg rounded-2xl my-9">
 
             {/* Pytanie 1 */}
             <div className="space-y-2">
@@ -172,7 +172,7 @@ export default function SzczegolowyFormularz() {
                 <button
                     type="submit"
                     disabled={submissionStatus === 'submitting'}
-                    className="px-12 py-4 bg-blue-500 font-bold text-white text-xl rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 disabled:bg-slate-500 disabled:cursor-wait"
+                    className="px-12 py-4 bg-blue-700 font-bold text-white text-xl rounded-lg hover:bg-blue-800 transition-colors shadow-lg shadow-blue-900/30 disabled:bg-slate-500 disabled:cursor-wait"
                 >
                     {submissionStatus === 'submitting' ? 'Wysyłanie...' : 'Oblicz moją ugodę'}
                 </button>

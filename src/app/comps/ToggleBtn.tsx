@@ -41,10 +41,10 @@ export default function ToggleButtonGroup({ options, selectedValue, onChange }: 
               ${isSelected
                             ? 'bg-blue-800 border-blue-800 shadow-lg shadow-blue-500/20'
                             // Używamy `brand-bg-light` i `brand-border` z Twojego pliku tailwind.config.ts
-                            : 'bg-brand-bg-light border-brand-border hover:border-blue-500'
+                            : 'bg-brand-bg-light border-blue-800    border hover:border-blue-500'
                         }`}
                     >
-                        {option.icon && <option.icon className={`mb-2 h-7 w-7 ${isSelected ? 'text-white' : 'text-slate-900'}`} />}
+                        {option.icon && <option.icon className={`mb-2 h-7 w-7 ${isSelected ? 'text-white' : 'text-blue-800'}`} />}
                         {/* POPRAWKA: `text-slate-300` dla lepszego kontrastu na ciemnym tle */}
                         <span className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-900'}`}>{option.label}</span>
                     </button>

@@ -11,12 +11,12 @@ const Logo = () => (
     <div className="flex items-center space-x-2">
         <div className="relative w-10 h-10">
             <Image
-                src="/logo.png"
+                src="/images/logo.png"
                 fill
                 alt="Logo"
             />
         </div>
-        <span className="font-serif text-lg text-gray-800">Zaręczyny Marzeń</span>
+        <span className=" text-lg text-gray-800">DługoMat</span>
     </div>
 );
 
@@ -51,10 +51,8 @@ export default function Navbar() {
 
 
     const navLinks = [
-        { name: 'O nas', href: '/o-nas' },
-        { name: 'Galeria', href: '/galeria' },
+        { name: 'Blog', href: '/blog' },
         { name: 'Kontakt', href: '/kontakt' },
-        { name: 'Konsjerż', href: '/concierge' },
     ];
 
     return (
